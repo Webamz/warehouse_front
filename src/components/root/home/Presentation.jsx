@@ -7,7 +7,7 @@ const Presentation = () => {
     <section className={styles.presentation}>
       <section className={styles.introduction}>
         <article className={styles.intro_text}>
-          <h1>Ready to go global?</h1>
+          <h1>Discover</h1>
           <p>
             Find out the best warehouses for you in your area.
           </p>

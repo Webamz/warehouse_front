@@ -1,107 +1,14 @@
-// import React from "react";
-// import Footer from "../../fragments/footer/Footer";
-// import styles from "../../../../css/UserHome.module.css";
-// import style from "../../../../css/Footer.module.css";
-// import BackgroundHome from "../../fragments/background/BackgroundHome";
-// import { useState, useLayoutEffect } from "react";
-// import { Link } from "react-router-dom";
-// import { useNavigate } from "react-router-dom";
-// import MyTheWarehousesDataService from "../../../../api/warehouse/MyTheWarehousesDataService";
-
-// const MyTheWarehouses = () => {
-//   const navigate = useNavigate();
-
-//   const [state, setState] = useState({
-//     theWarehouses: [],
-//   });
-
-//   const [welcomeDiv, setWelcomeDiv] = useState({ showDiv: false });
-
-//   const handleSort = (value) => (event) => {
-//     event.preventDefault();
-//     let path = "/theWarehouse/" + value;
-//     navigate(path, { state: { id: value } });
-//   };
-
-//   useLayoutEffect(() => {
-//     let unmounted = false;
-
-//     MyTheWarehousesDataService().then((response) => {
-//       if (!unmounted) {
-//         setState(response.data);
-//         setWelcomeDiv({ showDiv: false });
-//       }
-//       if (!Object.keys(response.data).length) {
-//         setWelcomeDiv({ showDiv: true });
-//       }
-//     });
-//     return () => {
-//       unmounted = true;
-//     };
-//   }, []);
-//   return (
-//     <>
-//       <BackgroundHome />
-//       <main className={styles.theWarehouse_main}>
-//         <section className={styles.theWarehouse_container_home}>
-//           {state.length !== undefined && (
-//             <section className={styles.cards}>
-//               {state.map((warehouse) => (
-//                 <div key={warehouse.id} className={styles.rapper}>
-//                   <Link
-//                     to="#"
-//                     onClick={handleSort(warehouse.id)}
-//                     className={styles.card}
-//                     id={warehouse.id}
-//                   >
-//                     <section className={styles.card_image_container}>
-//                       <img src={warehouse.profileImgUrl} alt="warehouse" />
-//                     </section>
-
-//                     <section className={styles.card_content}>
-//                       <p className={styles.card_title}>{warehouse.name}</p>
-//                       <div className={styles.card_info}>
-//                         <p className={styles.text_medium}> Find out more...</p>
-//                         <p className={styles.card_price}>{warehouse.price} RWF</p>
-//                       </div>
-//                     </section>
-//                   </Link>
-//                 </div>
-//               ))}
-//             </section>
-//           )}
-
-//           {welcomeDiv.showDiv && (
-//             <div>
-//               <article className={styles.introduction_home}>
-//                 <div className={styles.intro_text}>
-//                   <p>You have no saved theWarehouses.</p>
-//                 </div>
-//               </article>
-//             </div>
-//           )}
-//         </section>
-//       </main>
-//       <Footer class={style.footer_theWarehouse_details} />
-//     </>
-//   );
-// };
-
-// export default MyTheWarehouses;
-
-
-
-
-
-
 import React, { useState, useEffect } from "react";
-import Footer from "../../fragments/footer/Footer";
-import styles from "../../../../css/UserHome.module.css";
-import style from "../../../../css/Footer.module.css";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FaFilter } from "react-icons/fa";
 import { IoMdSearch } from "react-icons/io";
+
+import styles from "../../../../css/UserHome.module.css";
+import style from "../../../../css/Footer.module.css";
+
 import MyTheWarehousesDataService from "../../../../api/warehouse/MyTheWarehousesDataService";
+
+import Footer from "../../fragments/footer/Footer";
 
 const MyTheWarehouses = () => {
   const navigate = useNavigate();
@@ -109,11 +16,16 @@ const MyTheWarehouses = () => {
   const [state, setState] = useState({
     warehouses: [],
     searchedWarehouses: [],
+    currentPage: 1,
   });
 
   useEffect(() => {
     MyTheWarehousesDataService().then((response) => {
-      setState({ warehouses: response.data, searchedWarehouses: response.data });
+      setState({
+        warehouses: response.data,
+        searchedWarehouses: response.data.slice(0, 3),
+        currentPage: 1,
+      });
     });
   }, []);
 
@@ -126,13 +38,36 @@ const MyTheWarehouses = () => {
     const { value } = event.target;
     let warehouses = [...state.warehouses];
     if (value === "") {
-      setState({ ...state, searchedWarehouses: warehouses });
+      setState({
+        ...state,
+        searchedWarehouses: warehouses.slice(
+          (state.currentPage - 1) * 3,
+          state.currentPage * 3
+        ),
+      });
     } else {
       let searchedWarehouses = warehouses.filter((warehouse) =>
         warehouse.name.toLowerCase().includes(value.toLowerCase())
       );
-      setState({ ...state, searchedWarehouses });
+      setState({
+        ...state,
+        searchedWarehouses: searchedWarehouses.slice(
+          (state.currentPage - 1) * 3,
+          state.currentPage * 3
+        ),
+      });
     }
+  };
+
+  const handlePageChange = (pageNumber) => {
+    setState({
+      ...state,
+      searchedWarehouses: state.warehouses.slice(
+        (pageNumber - 1) * 3,
+        pageNumber * 3
+      ),
+      currentPage: pageNumber,
+    });
   };
 
   return (
@@ -160,7 +95,13 @@ const MyTheWarehouses = () => {
                   } else if (e.target.value === "price_desc") {
                     warehouses.sort((a, b) => b.price - a.price);
                   }
-                  setState({ ...state, searchedWarehouses: warehouses });
+                  setState({
+                    ...state,
+                    searchedWarehouses: warehouses.slice(
+                      (state.currentPage - 1) * 3,
+                      state.currentPage * 3
+                    ),
+                  });
                 }}
               >
                 <option value="">Filter</option>
@@ -170,43 +111,74 @@ const MyTheWarehouses = () => {
             </div>
           </div>
 
-             
-
           {state.searchedWarehouses.map((warehouse) => (
-            <div key={warehouse.id} className={styles.rapper}>
-              <Link
-                to={`/theWarehouse/${warehouse.id}`}
-                onClick={() => handleSort(warehouse.id)}
-                className={styles.card}
-                id={warehouse.id}
-              >
-                <section className={styles.card_image_container}>
-                  <img src={warehouse.profileImgUrl} alt="warehouse" />
-                </section>
-
-                <section className={styles.card_content}>
-                  <p className={styles.card_title}>{warehouse.name}</p>
-                  <div className={styles.card_info}>
-                    <p className={styles.text_medium}>Find out more...</p>
-                    <p className={styles.card_price}>{warehouse.price} RWF</p>
-                  </div>
-                </section>
-              </Link>
+            <div
+              key={warehouse.id}
+              className={`${styles.warehouse_card} ${styles.theWarehouse_container}`}
+            >
+              <img
+                className={styles.warehouse_image}
+                src={warehouse.profileImgUrl}
+                alt={warehouse.name}
+              />
+              <div className={styles.warehouse_details}>
+                <h3>{warehouse.name}</h3>
+                <p>{warehouse.price} Rwf</p>
+                <button
+                  className={styles.details_button}
+                  onClick={() => handleSort(warehouse.id)}
+                >
+                  View Details
+                </button>
+              </div>
             </div>
           ))}
-        </section>
+          <div className={styles.pagination_container}>
+            {state.warehouses.length > 0 && (
+              <div className={styles.pagination}>
+                {state.currentPage > 1 && (
+                  <button
+                    className={styles.page_button}
+                    onClick={() =>
+                      handlePageChange(state.currentPage - 1)
+                    }
+                  >
+                    Prev
+                  </button>
+                )}
 
+                {[...Array(Math.ceil(state.warehouses.length / 3))].map(
+                  (page, index) => (
+                    <button
+                      key={index}
+                      className={`${styles.page_button} ${index + 1 === state.currentPage && styles.active
+                        }`}
+                      onClick={() => handlePageChange(index + 1)}
+                    >
+                      {index + 1}
+                    </button>
+                  )
+                )}
+
+                {state.currentPage <
+                  Math.ceil(state.warehouses.length / 3) && (
+                    <button
+                      className={styles.page_button}
+                      onClick={() =>
+                        handlePageChange(state.currentPage + 1)
+                      }
+                    >
+                      Next
+                    </button>
+                  )}
+              </div>
+            )}
+          </div>
+        </section>
       </main>
-      <Footer class={style.footer_theWarehouse_details} />
+      <Footer className={style.footer} />
     </>
   );
 };
 
 export default MyTheWarehouses;
-
-
-
-
-
-
-
