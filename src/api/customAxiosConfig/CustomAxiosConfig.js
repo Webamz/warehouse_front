@@ -2,7 +2,7 @@ import axios from "axios";
 
 // axios instance for making requests
 const axiosInstance = axios.create({
-  baseURL: "https://warehousebackend-production.up.railway.app",
+  baseURL: "https://backend-warehouse.onrender.com",
 });
 
 // request interceptor for adding token
