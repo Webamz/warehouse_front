@@ -3,7 +3,7 @@ import axios from "axios";
 
 const HomeService = () => {
   try {
-    return axios.get("http://localhost:8080/");
+    return axios.get("https://warehousebackend-production.up.railway.app//");
   } catch (err) {
     let error = "";
     if (err.response) {
