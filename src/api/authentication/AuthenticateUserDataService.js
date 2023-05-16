@@ -2,7 +2,7 @@ import axios from "axios";
 
 const AuthenticateUserDataService = (username, password) => {
   return axios
-    .post(`https://warehousebackend-production.up.railway.app//authenticate`, {
+    .post(`https://warehousebackend-production.up.railway.app/authenticate`, {
       username,
       password,
     })
