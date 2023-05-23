@@ -22,4 +22,5 @@ const AuthenticateUserDataService = (username, password) => {
     });
 };
 
-export default AuthenticateUserDataService;
+const authenticationService = new AuthenticationService();
+export default authenticationService;
