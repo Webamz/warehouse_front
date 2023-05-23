@@ -1,34 +1,6 @@
-// import axios from "axios";
-
-// const AuthenticateUserDataService = (username, password) => {
-//   return axios
-//     .post(`https://backend-warehouse.onrender.com/authenticate`, {
-//       username,
-//       password,
-//     })
-//     .then((res) => {
-//       if (res != null) {
-//         console.log(res);
-//         return res;
-//       }
-//     })
-//     .catch((err) => {
-//       let error = "";
-
-//       if (err.response) {
-//         error += err.response;
-//       }
-//       return error;
-//     });
-// };
-
-// const authenticationService = new AuthenticateUserDataService();
-// export default authenticationService;
-
-
 import axios from "axios";
 
-function AuthenticateUserDataService(username, password) {
+const AuthenticateUserDataService = (username, password) => {
   return axios
     .post(`https://backend-warehouse.onrender.com/authenticate`, {
       username,
@@ -48,6 +20,6 @@ function AuthenticateUserDataService(username, password) {
       }
       return error;
     });
-}
+};
 
 export default AuthenticateUserDataService;
